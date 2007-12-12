@@ -1,6 +1,6 @@
 /**** IR Mrakomer3 ****/
 #define VERSION "3.0"
-#define ID "$Id: $"
+#define ID "$Id:  $"
 #include "main.h"
 
 #define  SA          0x00     // Slave Address (0 for single slave / 0x5A<<1 default)
