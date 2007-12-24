@@ -3,7 +3,7 @@
 
 #FUSES WDT                 	//Watch Dog Timer
 #FUSES INTRC_IO              	//Internal RC Osc, no CLKOUT
-#FUSES NOPUT                 	//No Power Up Timer
+#FUSES PUT                 	//Power Up Timer
 #FUSES NOMCLR                	//Master Clear pin used for I/O
 #FUSES NOBROWNOUT            	//No brownout reset
 #FUSES NOLVP                 	//No low voltage prgming, B3(PIC16) or B5(PIC18) used for I/O
@@ -16,5 +16,5 @@
 
 #use delay(clock=4000000)
 #use rs232(baud=2400,parity=N,xmit=PIN_B5,rcv=PIN_B2,bits=8)
-#use i2c(Master,Slow,sda=PIN_B1,scl=PIN_B4)//,force_hw)
+#use i2c(Master,Slow,sda=PIN_B1,scl=PIN_B4,SMBUS)//,force_hw)
 
