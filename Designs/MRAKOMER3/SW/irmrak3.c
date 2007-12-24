@@ -2,7 +2,6 @@
 #define VERSION "3.0"
 #define ID "$Id$"
 #include "irmrak3.h"
-#bit  SSPM3=0x14.3
 
 #define  SA          0x00     // Slave Address (0 for single slave / 0x5A<<1 default)
 #define  RAM_Access  0x00     // RAM access command
@@ -128,8 +127,6 @@ void main()
    setup_vref(FALSE);
    setup_oscillator(OSC_4MHZ|OSC_INTRC);
 
-//   SSPM3=1;
-
    delay_ms(1000);
    printf("\n\r* Mrakomer %s (C) 2007 KAKL *\n\r",VER);   // Welcome message
    printf("* %s *\n\r\n\r",REV);
@@ -145,7 +142,7 @@ void main()
 
       if (kbhit())      // Would you like warmer?
       {
-         getc(); i=0;  
+         getc(); i=0;
       }
 
       tempa=ReadTemp(SA, RAM_Tamb);       // Read temperatures from sensor
