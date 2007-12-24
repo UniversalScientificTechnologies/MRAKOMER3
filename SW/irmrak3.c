@@ -143,10 +143,9 @@ void main()
    {
       n++;
 
-      if (kbhit())
+      if (kbhit())      // Would you like warmer?
       {
-         delay_ms(200);
-         if ('w'==getc()) i=0;  // Would you like warmer?
+         getc(); i=0;  
       }
 
       tempa=ReadTemp(SA, RAM_Tamb);       // Read temperatures from sensor
@@ -154,7 +153,7 @@ void main()
 
       if((0==tempa)||(0==temp))           // Transfer error?
       {
-         printf("%Lu;ta:-273;ts:-273;Error\n\r",n);
+         printf("%Lu;ta:-273;ts:-273;sta:-1\n\r",n);
          output_low(HEATING);
       }
       else
@@ -162,15 +161,15 @@ void main()
          to=(signed int16)(temp*2-27315)/100;
          ta=(signed int16)(tempa*2-27315)/100;
 
-         printf("%Lu;ta:%Ld;ts:%Ld;",n,ta,to);
+         printf("%Lu;ta:%Ld;ts:%Ld;sta:",n,ta,to);
          if (i>=MAXHEAT)
          {
-            printf("OK\n\r");
+            printf("0\n\r");
             output_low(HEATING);
          }
          else
          {
-            printf("Heating\n\r");
+            printf("1\n\r");
             output_high(HEATING);
             i++;
          }
