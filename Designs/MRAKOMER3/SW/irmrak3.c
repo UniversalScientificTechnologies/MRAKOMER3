@@ -10,8 +10,26 @@
 #define  HEATING     PIN_A2   // Heating for defrosting
 #define  MAXHEAT     60       // Number of cycles for heating
 
-char VER[4]=VERSION;
-char REV[50]=ID;
+char  VER[4]=VERSION;
+char  REV[50]=ID;
+
+int8  heat;
+
+#INT_RDA
+rs232_handler()
+{
+   char ch;
+
+   if (getc()=='h')
+   {
+      heat=0;           // Need warmer
+   }
+   else
+   {
+      heat=MAXHEAT;     // Stop heating
+   } 
+}
+
 
 unsigned char PEC_calculation(unsigned char pec[]) // CRC calculation
 {
@@ -89,6 +107,7 @@ int16 ReadTemp(int8 addr, int8 select)    // Read sensor RAM
    int8 crc;                     // Readed CRC
    int16 temp;                   // Readed temperature
 
+   disable_interrupts(GLOBAL);
    i2c_stop();
    i2c_start();
    i2c_write(addr);
@@ -100,6 +119,7 @@ int16 ReadTemp(int8 addr, int8 select)    // Read sensor RAM
    temp=MAKE16(arr[1],arr[2]);
    crc=i2c_read(0);           //crc
    i2c_stop();
+   enable_interrupts(GLOBAL);
 
    arr[5]=addr;
    arr[4]=RAM_Access|select;
@@ -114,7 +134,6 @@ void main()
 {
    unsigned int16 n, temp, tempa;
    signed int16 ta, to;
-   int8 i;
 
    output_low(HEATING);                 // Heating off
    setup_wdt(WDT_2304MS);               // Setup Watch Dog
@@ -134,16 +153,14 @@ void main()
    temp=ReadTemp(SA, RAM_Tobj1);
 
    n=0;
-   i=MAXHEAT;
+   heat=MAXHEAT;
+   
+   enable_interrupts(GLOBAL);
+   enable_interrupts(INT_RDA);
 
    while(TRUE)
    {
       n++;
-
-      if (kbhit())      // Would you like warmer?
-      {
-         getc(); i=0;
-      }
 
       tempa=ReadTemp(SA, RAM_Tamb);       // Read temperatures from sensor
       temp=ReadTemp(SA, RAM_Tobj1);
@@ -159,7 +176,7 @@ void main()
          ta=(signed int16)(tempa*2-27315)/100;
 
          printf("%Lu;ta:%Ld;ts:%Ld;sta:",n,ta,to);
-         if (i>=MAXHEAT)
+         if (heat>=MAXHEAT)
          {
             printf("0\n\r");
             output_low(HEATING);
@@ -168,7 +185,7 @@ void main()
          {
             printf("1\n\r");
             output_high(HEATING);
-            i++;
+            heat++;
          }
       };
       restart_wdt();
