@@ -1,5 +1,5 @@
 /**** IR Mrakomer3 ****/
-#define VERSION "3.0"
+#define VERSION "3.1"
 #define ID "$Id$"
 #include "irmrak3.h"
 
@@ -14,6 +14,7 @@ char  VER[4]=VERSION;
 char  REV[50]=ID;
 
 int8  heat;
+int1  flag;
 
 #INT_RDA
 rs232_handler()
@@ -27,7 +28,9 @@ rs232_handler()
    else
    {
       heat=MAXHEAT;     // Stop heating
-   } 
+   };
+
+   flag=TRUE;
 }
 
 
@@ -148,48 +151,64 @@ void main()
 
    delay_ms(1000);
    printf("\n\r* Mrakomer %s (C) 2007 KAKL *\n\r",VER);   // Welcome message
-   printf("* %s *\n\r\n\r",REV);
+   printf("* %s *\n\r",REV);
+   printf("<#seq.> <ambient temp.> <space temp.> <status>\n\r\n\r");
    tempa=ReadTemp(SA, RAM_Tamb);       // Dummy read
    temp=ReadTemp(SA, RAM_Tobj1);
 
    n=0;
    heat=MAXHEAT;
-   
+   flag=FALSE;
+
    enable_interrupts(GLOBAL);
    enable_interrupts(INT_RDA);
 
    while(TRUE)
    {
-      n++;
 
-      tempa=ReadTemp(SA, RAM_Tamb);       // Read temperatures from sensor
-      temp=ReadTemp(SA, RAM_Tobj1);
-
-      if((0==tempa)||(0==temp))           // Transfer error?
+      if (flag)
       {
-         printf("%Lu;ta:-273;ts:-273;sta:-1\n\r",n);
+         n++;        // Increment the number of measurement
+
+         tempa=ReadTemp(SA, RAM_Tamb);       // Read temperatures from sensor
+         temp=ReadTemp(SA, RAM_Tobj1);
+
+         to=(signed int16)(temp*2-27315);
+         ta=(signed int16)(tempa*2-27315);
+
+         printf("%Lu %.1g %.1g ",n,(float)ta/100,(float)to/100);
+
+         if((0==tempa)||(0==temp))           // Transfer error?
+         {
+            printf("-1\n\r");
+            heat=MAXHEAT;
+         }
+         else
+         {
+            if (heat>=MAXHEAT)               // Active heating?
+            {
+               printf("0\n\r");
+            }
+            else
+            {
+               printf("1\n\r");
+            }
+         }
+
+         flag=FALSE;
+      };
+
+      if (heat>=MAXHEAT)                     // Continue heating?
+      {
          output_low(HEATING);
       }
       else
       {
-         to=(signed int16)(temp*2-27315)/100;
-         ta=(signed int16)(tempa*2-27315)/100;
-
-         printf("%Lu;ta:%Ld;ts:%Ld;sta:",n,ta,to);
-         if (heat>=MAXHEAT)
-         {
-            printf("0\n\r");
-            output_low(HEATING);
-         }
-         else
-         {
-            printf("1\n\r");
-            output_high(HEATING);
-            heat++;
-         }
-      };
+         output_high(HEATING);
+         heat++;
+      }
       restart_wdt();
-      delay_ms(900);
+      delay_ms(1000);
    }
 }
 
