@@ -147,7 +147,7 @@ void main()
    setup_timer_2(T2_DISABLED,0,1);
    setup_comparator(NC_NC_NC_NC);
    setup_vref(FALSE);
-   setup_oscillator(OSC_4MHZ|OSC_INTRC);
+   setup_oscillator(OSC_4MHZ|OSC_INTRC,+2);
 
    delay_ms(1000);
    printf("\n\r* Mrakomer %s (C) 2007 KAKL *\n\r",VER);   // Welcome message
