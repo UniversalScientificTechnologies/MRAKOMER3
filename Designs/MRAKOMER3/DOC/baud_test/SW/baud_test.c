@@ -2,7 +2,7 @@
 
 #include "baud_test.h"
 
-#define HEATING    PIN_A2 
+#define HEATING    PIN_A2
 
 volatile int1  flag_temp;
 volatile int8  ostun;
@@ -39,7 +39,7 @@ void main()
 
    //enable_interrupts(GLOBAL);
    //enable_interrupts(INT_RDA);
-   
+
    while(TRUE)
    {
       while (flag_temp)
