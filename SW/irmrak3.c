@@ -167,7 +167,7 @@ void main()
    while(TRUE)
    {
 
-      if (flag)
+//      if (flag)
       {
          n++;        // Increment the number of measurement
 
